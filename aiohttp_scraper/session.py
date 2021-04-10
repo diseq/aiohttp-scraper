@@ -9,6 +9,7 @@ from aiohttp.hdrs import METH_GET
 from aiohttp_scraper.exceptions import Unsuccessful, AllRetriesFailed
 from aiohttp_scraper.proxies import Proxies
 from aiohttp_scraper.user_agents import USER_AGENTS
+from aiohttp_socks import ProxyType, ProxyConnector, ChainProxyConnector
 
 
 class ScraperSession(ClientSession):
@@ -62,7 +63,8 @@ class ScraperSession(ClientSession):
                 )
 
             if self.proxies:
-                kwargs["proxy"] = await self.proxies.select_proxy(url=args[1])
+                proxy = await self.proxies.select_proxy(url=args[1])
+                self._connector =  ProxyConnector.from_url(proxy)
 
             try:
                 response = await super()._request(*args, **kwargs)
